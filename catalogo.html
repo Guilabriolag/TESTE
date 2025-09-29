@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McClone Cardápio</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#DA291C">
+    <style>
+        :root {
+            --color-primary: #FFCC00;
+            --color-secondary: #DA291C;
+            --bg: #fff;
+            --font: 'Inter', sans-serif;
+        }
+        body { margin:0; font-family:var(--font); background:var(--bg); color:#333; }
+        header { background:var(--color-secondary); color:#fff; padding:12px; display:flex; justify-content:space-between; align-items:center; user-select:none; }
+        header h1 { margin:0; font-size:1.2rem; font-weight:bold; }
+        button { padding:8px 16px; margin:4px 2px; border:none; border-radius:24px; cursor:pointer; font-weight:600; transition:all 0.2s ease-in-out; }
+        button:hover { transform:translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+        .btn-primary { background:var(--color-primary); color:#000; }
+        .btn-secondary { background:var(--color-secondary); color:#fff; }
+        .btn-ghost { background:transparent; color:var(--color-secondary); border:1px solid var(--color-secondary); }
+        .btn-danger { background:#e53e3e; color:#fff; }
+        .input-field { width:calc(100% - 16px); padding:8px; margin:4px 0; border:1px solid #ccc; border-radius:8px; }
+        .card-item { border:1px solid #ddd; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; cursor:pointer; transition:transform 0.2s; }
+        .card-item:hover { transform:scale(1.02); }
+        .card-item .thumb img { width:100%; height:120px; object-fit:cover; }
+        .drawer { position:fixed; top:0; right:-320px; width:320px; height:100%; background:#fff; box-shadow:-2px 0 8px rgba(0,0,0,.3); transition:0.3s; padding:12px; overflow-y:auto; z-index:100; }
+        .drawer.open { right:0; }
+        .screen { padding:12px; display:none; }
+        .screen.active { display:block; }
+        .small { font-size:0.75rem; color:#555; }
+        .kv { font-size:0.7rem; color:#999; }
+        .hr { border-top:1px solid #ccc; margin:6px 0; }
+        #cartFab { position:fixed; bottom:16px; right:16px; background:var(--color-primary); border-radius:50%; width:56px; height:56px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:90; }
+        #cartCount { position:absolute; top:-4px; right:-4px; background:red; color:#fff; border-radius:50%; width:20px; height:20px; font-size:0.7rem; display:flex; align-items:center; justify-content:center; }
+        .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; }
+        .filter-tab { white-space: nowrap; padding: 8px 12px; background: #f0f0f0; border-radius: 24px; cursor: pointer; }
+        .filter-tab.active { background: var(--color-secondary); color: #fff; }
+        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:12px 24px; background:rgba(0,0,0,0.8); color:#fff; border-radius:24px; z-index:1000; opacity:0; transition:opacity 0.3s ease-in-out; pointer-events:none; }
+        .toast.show { opacity:1; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+    <h1>McClone Cardápio</h1>
+    <div id="userInfo"></div>
+</header>
+<main>
+    <div id="totemScreen" class="screen active">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2 style="margin:0;">Cardápio</h2>
+        </div>
+        <div id="categoryTabs" class="filter-tabs"></div>
+        <div id="subcategoryTabs" class="filter-tabs" style="display:none;"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;padding:8px;" id="totemGrid"></div>
+    </div>
+    <div class="drawer" id="drawer">
+        <h3>Carrinho</h3>
+        <div id="cartItems" style="margin-bottom:12px;"></div>
+        <div style="font-weight:bold;margin-top:12px;">Total: R$ <span id="cartSum">0.00</span></div>
+        <button class="btn-primary" onclick="checkout()">Finalizar pedido</button>
+        <button class="btn-ghost" onclick="clearCart()">Limpar</button>
+        <button class="btn-ghost" onclick="toggleDrawer()">Fechar</button>
+    </div>
+    <div id="cartFab" onclick="toggleDrawer()">
+        🛒
+        <div id="cartCount">0</div>
+    </div>
+</main>
+<div id="toast" class="toast"></div>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const BIN_ID = urlParams.get('bin'); // Pega o BIN_ID da URL
+
+    /* -------------------- Global State & Data Storage -------------------- */
+    const LS = {
+        PRODS: `mcProds_${BIN_ID}`,
+        SETUP: `mcSetup_${BIN_ID}`,
+        CUSTOM: `mcCustom_${BIN_ID}`,
+        CART: `mcCart_${BIN_ID}`,
+    };
+    const STATE = {
+        products: [],
+        cart: { items: [] },
+        setup: { whatsapp: '', lowStockThreshold: 5, storeOpen: true, pixKey: '', bankInfo: '', paymentMessage: '' },
+        custom: { primary: '#FFCC00', secondary: '#DA291C', bg: '#fff', font: 'Inter' },
+        selectedCategory: 'Todos',
+        selectedSubcategory: null
+    };
+
+    /* -------------------- Utility Functions -------------------- */
+    function $(id) { return document.getElementById(id); }
+    function lsGet(k) { return JSON.parse(localStorage.getItem(k) || '[]'); }
+    function lsSet(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+    function formatMoney(v) { return (v || 0).toFixed(2).replace('.', ','); }
+    function toast(msg) {
+        const t = $('toast');
+        t.innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    /* -------------------- JSONBIN.IO Integration -------------------- */
+    async function loadDataAndPopulateForms() {
+        if (!BIN_ID) {
+            toast('BIN_ID não encontrado na URL.');
+            return;
+        }
+        try {
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const {
+                record
+            } = await response.json();
+            if (record) {
+                STATE.products = record.products || [];
+                STATE.setup = record.setup || STATE.setup;
+                STATE.custom = record.custom || STATE.custom;
+                applyCustomizations();
+                renderProducts();
+                renderCategories();
+                toast('Cardápio carregado!');
+            }
+        } catch (error) {
+            console.error('Erro ao carregar do JSONBin:', error);
+            toast('Erro ao carregar cardápio do servidor.');
+        }
+    }
+    /* -------------------- Initializers -------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDataAndPopulateForms();
+        renderCart();
+        switchScreen('totemScreen');
+    });
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        $(screenId).classList.add('active');
+    }
+    function applyCustomizations() {
+        document.documentElement.style.setProperty('--color-primary', STATE.custom.primary);
+        document.documentElement.style.setProperty('--color-secondary', STATE.custom.secondary);
+        document.documentElement.style.setProperty('--bg', STATE.custom.bg);
+        document.documentElement.style.setProperty('--font', `'${STATE.custom.font}', sans-serif`);
+    }
+    /* -------------------- Totem & Cart -------------------- */
+    function renderCategories() {
+        const categories = ['Todos', ...new Set(STATE.products.filter(p => !p.isCombo).map(p => p.cat))].filter(c => c);
+        const catTabs = $('categoryTabs');
+        catTabs.innerHTML = '';
+        categories.forEach(cat => {
+            const btn = document.createElement('div');
+            btn.className = `filter-tab ${STATE.selectedCategory === cat ? 'active' : ''}`;
+            btn.innerText = cat;
+            btn.onclick = () => filterProducts(cat);
+            catTabs.appendChild(btn);
+        });
+        if (STATE.selectedCategory && STATE.selectedCategory !== 'Todos') {
+            renderSubcategories(STATE.selectedCategory);
+        } else {
+            $('subcategoryTabs').style.display = 'none';
+        }
+        renderProducts();
+    }
+    function renderSubcategories(category) {
+        const subcats = ['Todos', ...new Set(STATE.products.filter(p => p.cat === category && !p.isCombo).map(p => p.subcat))].filter(sc => sc);
+        const subcatTabs = $('subcategoryTabs');
+        subcatTabs.innerHTML = '';
+        if (subcats.length > 1) {
+            subcatTabs.style.display = 'flex';
+            subcats.forEach(subcat => {
+                const btn = document.createElement('div');
+                btn.className = `filter-tab ${STATE.selectedSubcategory === subcat ? 'active' : ''}`;
+                btn.innerText = subcat;
+                btn.onclick = () => filterProducts(category, subcat);
+                subcatTabs.appendChild(btn);
+            });
+        } else {
+            subcatTabs.style.display = 'none';
+            STATE.selectedSubcategory = null;
+        }
+    }
+    function filterProducts(category, subcategory = null) {
+        STATE.selectedCategory = category;
+        STATE.selectedSubcategory = subcategory;
+        document.querySelectorAll('#categoryTabs .filter-tab').forEach(b => b.classList.remove('active'));
+        document.querySelector(`#categoryTabs .filter-tab[data-category="${category}"]`)?.classList.add('active');
+        if (category === 'Todos') {
+            $('subcategoryTabs').style.display = 'none';
+        } else {
+            renderSubcategories(category);
+        }
+        renderProducts();
+    }
+    function renderProducts() {
+        const grid = $('totemGrid');
+        grid.innerHTML = '';
+        let filteredProducts = STATE.products.filter(p => p.available);
+        if (STATE.selectedCategory === 'Todos') {
+            filteredProducts = STATE.products.filter(p => p.available);
+        } else {
+            filteredProducts = filteredProducts.filter(p => p.cat === STATE.selectedCategory);
+            if (STATE.selectedSubcategory && STATE.selectedSubcategory !== 'Todos') {
+                filteredProducts = filteredProducts.filter(p => p.subcat === STATE.selectedSubcategory);
+            }
+        }
+        filteredProducts.forEach((p) => {
+            const div = document.createElement('div');
+            div.className = 'card-item';
+            div.onclick = () => addToCart(p.id);
+            const comboInfo = p.isCombo ? ' Combo' : '';
+            div.innerHTML = `<div class="thumb"><img src="${p.img}" alt="${p.name}"></div> <div style="padding:4px;font-weight:bold">${p.name}</div> <div style="padding:2px" class="small">R$ ${formatMoney(p.price)}${comboInfo}</div> <div style="padding:2px" class="kv">Estoque: ${p.isCombo ? '---' : p.stock}</div>`;
+            grid.appendChild(div);
+        });
+    }
+    function toggleDrawer() { $('drawer').classList.toggle('open'); }
+    function renderCart() {
+        const list = $('cartItems');
+        const countEl = $('cartCount');
+        list.innerHTML = '';
+        if (!STATE.cart.items.length) {
+            list.innerHTML = '<div class="small">Carrinho vazio</div>';
+            countEl.innerText = '0';
+            $('cartSum').innerText = formatMoney(0);
+            return;
+        }
+        let sum = 0;
+        STATE.cart.items.forEach(i => {
+            sum += i.price * i.qty;
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.justifyContent = 'space-between';
+            row.style.alignItems = 'center';
+            row.style.margin = '4px 0';
+            row.innerHTML = `<span>${i.qty}x ${i.pname}</span> <div> <button class="btn-ghost" onclick="changeCartQty(${i.id},-1)">-</button> <button class="btn-ghost" onclick="changeCartQty(${i.id},1)">+</button> </div>`;
+            list.appendChild(row);
+        });
+        countEl.innerText = STATE.cart.items.reduce((s, i) => s + i.qty, 0);
+        $('cartSum').innerText = formatMoney(sum);
+        lsSet(LS.CART, STATE.cart);
+    }
+    function addToCart(id) {
+        if (!STATE.setup.storeOpen) {
+            toast('Loja fechada. Não é possível adicionar itens ao carrinho no momento.');
+            return;
+        }
+        const p = STATE.products.find(x => x.id == id);
+        if (!p) return;
+        if (p.isCombo) {
+            const allItemsHaveStock = p.comboItems.every(itemId => {
+                const item = STATE.products.find(prod => prod.id == itemId);
+                return item && item.stock > 0;
+            });
+            if (!allItemsHaveStock) {
+                toast(`Um ou mais itens do combo "${p.name}" estão fora de estoque.`);
+                return;
+            }
+        } else if (p.stock <= 0) {
+            toast(`${p.name} está fora de estoque.`);
+            return;
+        }
+        let item = STATE.cart.items.find(x => x.id == id);
+        if (item) {
+            item.qty++;
+        } else {
+            STATE.cart.items.push({
+                id,
+                pname: p.name,
+                price: p.price,
+                qty: 1,
+                isCombo: p.isCombo,
+                comboItems: p.comboItems
+            });
+        }
+        renderCart();
+        toast(`${p.name} adicionado!`);
+    }
+    function changeCartQty(id, ch) {
+        let item = STATE.cart.items.find(x => x.id == id);
+        if (!item) return;
+        item.qty += ch;
+        if (item.qty <= 0) {
+            STATE.cart.items = STATE.cart.items.filter(x => x.id != id);
+        }
+        renderCart();
+    }
+    function clearCart() {
+        STATE.cart.items = [];
+        renderCart();
+        toast('Carrinho limpo.');
+    }
+    /* -------------------- Checkout -------------------- */
+    function checkout() {
+        if (!STATE.cart.items.length) {
+            toast('Carrinho vazio');
+            return;
+        }
+        const phone = STATE.setup.whatsapp;
+        if (!phone) {
+            toast('O WhatsApp da loja não foi configurado. Por favor, avise o gerente.');
+            return;
+        }
+        const name = prompt('Seu nome:');
+        if (!name) {
+            toast('Pedido cancelado.');
+            return;
+        }
+        let msg = `Olá! Novo pedido de *${name}*:\n\n`;
+        let total = 0;
+        STATE.cart.items.forEach(i => {
+            msg += `${i.qty}x ${i.pname} - R$ ${formatMoney(i.price * i.qty)}\n`;
+            total += i.price * i.qty;
+        });
+        msg += `\nTotal do pedido: R$ ${formatMoney(total)}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        let paymentInfoMsg = '✅ Pedido Enviado!\n\n';
+        if (STATE.setup.pixKey) {
+            paymentInfoMsg += `💰 **Chave PIX:** ${STATE.setup.pixKey}\n\n`;
+        }
+        if (STATE.setup.bankInfo) {
+            paymentInfoMsg += `🏦 **Dados Bancários:** ${STATE.setup.bankInfo}\n\n`;
+        }
+        paymentInfoMsg += `Total a pagar: R$ ${formatMoney(total)}\n\n`;
+        if (STATE.setup.paymentMessage) {
+            paymentInfoMsg += STATE.setup.paymentMessage;
+        }
+        alert(paymentInfoMsg);
+        STATE.cart.items = [];
+        renderCart();
+        toast('Pedido enviado! Aguarde a confirmação.');
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if ($('drawer').classList.contains('open')) {
+                toggleDrawer();
+            }
+        }
+    });
+</script>
+</body>
+</html>
