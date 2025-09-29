@@ -215,9 +215,9 @@
 </main>
 <div id="toast" class="toast"></div>
 <script>
-    // Configurações do seu Bin
-    const BIN_ID = '68da0735ae596e708fff5da2';
-    const MASTER_KEY = 'SUA_MASTER_KEY'; // Coloque sua chave aqui
+    const urlParams = new URLSearchParams(window.location.search);
+    const BIN_ID = urlParams.get('bin');
+    const MASTER_KEY = urlParams.get('key');
 
     /* -------------------- Global State & Data Storage -------------------- */
     const LS = {
@@ -330,21 +330,20 @@
         return count >= KEY_LIMITS[keyType];
     }
     /* -------------------- JSONBIN.IO Integration -------------------- */
-    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-    const headers = {
-        'Content-Type': 'application/json',
-        'X-Master-Key': MASTER_KEY
-    };
     async function loadDataAndPopulateForms() {
+        if (!BIN_ID || !MASTER_KEY) {
+            toast('BIN_ID ou Chave Mestra não fornecidos na URL.');
+            return;
+        }
         try {
-            const response = await fetch(JSONBIN_URL + '/latest', {
-                headers: { ...headers,
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': MASTER_KEY,
                     'X-Access-Key': MASTER_KEY
                 }
             });
-            const {
-                record
-            } = await response.json();
+            const { record } = await response.json();
             if (record) {
                 Object.assign(STATE, record);
                 saveAll();
@@ -360,6 +359,10 @@
         }
     }
     async function saveAllToJSONBin() {
+        if (!BIN_ID || !MASTER_KEY) {
+            toast('BIN_ID ou Chave Mestra não fornecidos na URL.');
+            return;
+        }
         try {
             const dataToSave = {
                 products: STATE.products,
@@ -371,9 +374,11 @@
                 custom: STATE.custom,
                 pub: STATE.pub
             };
-            await fetch(JSONBIN_URL, {
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
-                headers: { ...headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': MASTER_KEY,
                     'X-Access-Key': MASTER_KEY,
                     'Private': false
                 },
@@ -900,4 +905,4 @@
     });
 </script>
 </body>
-  </html>
+    </html>
