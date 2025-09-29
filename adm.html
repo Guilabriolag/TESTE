@@ -46,6 +46,7 @@
         .slider:before { position: absolute; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #4CAF50; }
         input:checked + .slider:before { transform: translateX(20px); }
+        #apiStatus { padding:12px; margin-top:12px; border-radius:8px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; font-size:0.9rem; display:none; }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,6 +113,7 @@
                 <button type="submit" class="btn-primary">Salvar</button>
                 <button type="button" class="btn-ghost" onclick="resetForm('prodForm')">Limpar</button>
             </form>
+            <div id="apiStatus"></div>
             <hr class="hr">
             <table class="table-data" id="prodTable"></table>
         </div>
@@ -359,8 +361,16 @@
         }
     }
     async function saveAllToJSONBin() {
+        const apiStatusEl = $('apiStatus');
+        apiStatusEl.style.display = 'block';
+        apiStatusEl.style.background = '#e9ecef';
+        apiStatusEl.style.color = '#495057';
+        apiStatusEl.innerText = 'Salvando dados no JSONBin...';
+
         if (!BIN_ID || !MASTER_KEY) {
-            toast('BIN_ID ou Chave Mestra não fornecidos na URL.');
+            apiStatusEl.innerText = 'Erro: BIN_ID ou Chave Mestra não encontrados.';
+            apiStatusEl.style.background = '#f8d7da';
+            apiStatusEl.style.color = '#721c24';
             return;
         }
         try {
@@ -374,7 +384,7 @@
                 custom: STATE.custom,
                 pub: STATE.pub
             };
-            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -384,11 +394,25 @@
                 },
                 body: JSON.stringify(dataToSave)
             });
-            toast('Dados salvos no JSONBin!');
+            const result = await response.json();
+            if (response.ok) {
+                apiStatusEl.innerText = '✅ Dados salvos com sucesso!';
+                apiStatusEl.style.background = '#d4edda';
+                apiStatusEl.style.color = '#155724';
+                toast('Dados salvos no JSONBin!');
+            } else {
+                apiStatusEl.innerText = `❌ Erro ao salvar: ${JSON.stringify(result)}`;
+                apiStatusEl.style.background = '#f8d7da';
+                apiStatusEl.style.color = '#721c24';
+                toast('Erro ao salvar no servidor.');
+            }
         } catch (error) {
-            console.error('Erro ao salvar no JSONBin:', error);
+            apiStatusEl.innerText = `❌ Erro de rede: ${error.message}`;
+            apiStatusEl.style.background = '#f8d7da';
+            apiStatusEl.style.color = '#721c24';
             toast('Erro ao salvar no servidor.');
         }
+        setTimeout(() => { apiStatusEl.style.display = 'none'; }, 5000);
     }
     /* -------------------- Initializers -------------------- */
     document.addEventListener('DOMContentLoaded', () => {
@@ -905,4 +929,4 @@
     });
 </script>
 </body>
-</html>
+    </html>
