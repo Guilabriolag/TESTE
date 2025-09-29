@@ -820,7 +820,7 @@
         if (promoType === 'mais-caro') {
             const comboItems = $('comboItems').value.split(',').map(i => parseInt(i.trim()));
             const maxPrice = Math.max(...comboItems.map(id => {
-                const item = STATE.products.find(p => p.id === id);
+                const item = STATE.products.find(prod => prod.id === id);
                 return item ? item.price : 0;
             }));
             priceField.value = maxPrice;
@@ -905,4 +905,4 @@
     });
 </script>
 </body>
-    </html>
+</html>
