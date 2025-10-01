@@ -14,11 +14,10 @@
     <p>O controle completo do seu negócio em um só lugar.</p>
 </header>
 
-<nav id="menu"></nav>
+<nav id="menu">
+    </nav>
 
 <main>
-
-    <!-- Dashboard -->
     <section id="dashboard" class="tab">
         <div class="card">
             <h2>📊 Dashboard</h2>
@@ -29,7 +28,7 @@
                     <option value="mes">Este Mês</option>
                 </select>
             </div>
-            <div class="grid-container">
+            <div class="grid-container summary-grid">
                 <div class="summary-card">
                     <h4>Total de Vendas</h4>
                     <p>R$ 0,00</p>
@@ -53,7 +52,6 @@
         </div>
     </section>
 
-    <!-- Categorias -->
     <section id="categorias" class="tab">
         <div class="card">
             <h2>🗂️ Categorias e Subcategorias</h2>
@@ -61,37 +59,65 @@
                 <input type="text" placeholder="Nome da Nova Categoria">
                 <button>Criar Categoria</button>
             </div>
-            <div id="category-tree"></div>
+            <div id="category-tree">
+                <details>
+                    <summary>Lanches <button class="btn-small btn-danger">Excluir</button></summary>
+                    <ul>
+                        <li>Hamburgers <button class="btn-small btn-danger">Excluir</button></li>
+                        <li>Pizzas <button class="btn-small btn-danger">Excluir</button></li>
+                        <li><input type="text" placeholder="Nova Subcategoria"><button class="btn-small">Adicionar</button></li>
+                    </ul>
+                </details>
+            </div>
         </div>
     </section>
 
-    <!-- Produtos -->
+    <section id="modo-venda" class="tab">
+        <div class="card">
+            <h2>⚖️ Modo de Venda</h2>
+            <div class="form-group">
+                <label>Selecione o modo de venda:</label>
+                <select>
+                    <option>Unidade</option>
+                    <option>Kg</option>
+                    <option>Litro</option>
+                    <option>M²</option>
+                    <option>Combo</option>
+                    <option>Meia-a-meia</option>
+                    <option>Peso</option>
+                </select>
+                <label>Campo para fração (opcional):</label>
+                <input type="text" placeholder="Ex: ½, ¼">
+                <button>Adicionar Modo</button>
+            </div>
+        </div>
+    </section>
+
     <section id="produtos" class="tab">
         <div class="card">
             <h2>📦 Produtos</h2>
             <div class="grid-container cols-3">
-                <input type="text" placeholder="Nome do Produto">
-                <input type="number" placeholder="Preço (R$)">
-                <input type="text" placeholder="URL da Imagem">
-                <select><option>Categoria</option></select>
-                <select><option>Subcategoria</option></select>
-                <select><option>Modo de Venda</option></select>
-                <input type="number" placeholder="Estoque">
-                <label><input type="checkbox"> Destaque</label>
-                <label><input type="checkbox"> Ativo</label>
+                <input type="text" id="prodNome" placeholder="Nome do Produto">
+                <input type="number" id="prodPreco" placeholder="Preço (R$)">
+                <input type="text" id="prodImagem" placeholder="URL da Imagem">
+                <select id="prodCategoria"><option>Categoria</option></select>
+                <select id="prodSubcategoria"><option>Subcategoria</option></select>
+                <select id="prodModoVenda"><option>Modo de Venda</option></select>
+                <input type="number" id="prodEstoque" placeholder="Estoque">
+                <label class="checkbox-label"><input type="checkbox" id="prodDestaque"> Destaque</label>
+                <label class="checkbox-label"><input type="checkbox" id="prodAtivo"> Ativo</label>
             </div>
-            <textarea placeholder="Descrição do produto"></textarea>
+            <textarea id="prodDescricao" placeholder="Descrição do produto"></textarea>
             <div class="form-buttons">
-                <button>Criar Produto</button>
-                <button>Salvar Edição</button>
+                <button id="btnAdicionarProduto" class="btn-primary">Adicionar Produto</button>
             </div>
             <hr>
             <h3>Lista de Produtos</h3>
-            <div id="lista-produtos"></div>
+            <div id="listaProdutosContainer">
+                </div>
         </div>
     </section>
 
-    <!-- Clientes -->
     <section id="clientes" class="tab">
         <div class="card">
             <h2>👥 Clientes</h2>
@@ -102,15 +128,11 @@
                 <input type="text" placeholder="Bairro">
             </div>
             <textarea placeholder="Histórico e observações..."></textarea>
-            <label><input type="checkbox"> Permitir notificações</label>
-            <div class="form-buttons"><button>Salvar Cliente</button></div>
-            <hr>
-            <h3>Lista de Clientes</h3>
-            <div id="lista-clientes"></div>
+            <label class="checkbox-label"><input type="checkbox"> Permitir notificações</label>
+            <div class="form-buttons"><button class="btn-primary">Salvar Cliente</button></div>
         </div>
     </section>
 
-    <!-- Cupons -->
     <section id="cupons" class="tab">
         <div class="card">
             <h2>🎟️ Cupons</h2>
@@ -123,15 +145,11 @@
                 <input type="number" placeholder="Limite de uso">
             </div>
             <textarea placeholder="Mensagem promocional"></textarea>
-            <label><input type="checkbox"> Ativo</label>
-            <div class="form-buttons"><button>Criar Cupom</button></div>
-            <hr>
-            <h3>Cupons Ativos</h3>
-            <div id="lista-cupons"></div>
+            <label class="checkbox-label"><input type="checkbox"> Ativo</label>
+            <div class="form-buttons"><button class="btn-primary">Criar Cupom</button></div>
         </div>
     </section>
 
-    <!-- Publicidade -->
     <section id="publicidade" class="tab">
         <div class="card">
             <h2>📢 Publicidade</h2>
@@ -141,18 +159,17 @@
             <input type="text" placeholder="Link de destino">
             <h4>Carrossel de Imagens</h4>
             <textarea placeholder="URLs das imagens, uma por linha"></textarea>
-            <h4>Redes Sociais</h4>
+            <h4>Ícones Redes Sociais</h4>
             <input type="text" placeholder="Link do Instagram">
             <input type="text" placeholder="Link do Facebook">
             <input type="text" placeholder="Número do WhatsApp">
-            <div class="form-buttons"><button>Salvar Publicidade</button></div>
+            <div class="form-buttons"><button class="btn-primary">Salvar Publicidade</button></div>
         </div>
     </section>
 
-    <!-- Dados da Loja -->
     <section id="dados-loja" class="tab">
         <div class="card">
-            <h2>🗝️ Dados da Loja</h2>
+            <h2>🗝️ Keys / Dados da Loja</h2>
             <div class="grid-container cols-2">
                 <input type="text" placeholder="Nome da Loja">
                 <input type="tel" placeholder="Telefone Principal">
@@ -165,7 +182,6 @@
         </div>
     </section>
 
-    <!-- Cobertura -->
     <section id="cobertura" class="tab">
         <div class="card">
             <h2>🗺️ Cobertura de Entrega</h2>
@@ -174,14 +190,10 @@
                 <input type="number" placeholder="Taxa de Entrega (R$)">
                 <input type="text" placeholder="Tempo Estimado (min)">
             </div>
-            <div class="form-buttons"><button>Adicionar Bairro</button></div>
-            <hr>
-            <h3>Bairros Cadastrados</h3>
-            <div id="lista-bairros"></div>
+            <div class="form-buttons"><button class="btn-primary">Adicionar Bairro</button></div>
         </div>
     </section>
 
-    <!-- Customização -->
     <section id="customizar" class="tab">
         <div class="card">
             <h2>🎨 Customizar</h2>
@@ -189,32 +201,29 @@
             <input type="color" title="Cor Principal">
             <input type="text" placeholder="Fonte (Ex: Roboto)">
             <h4>Segurança</h4>
-            <label><input type="checkbox"> Ativar Modo Escuro</label>
+            <label class="checkbox-label"><input type="checkbox"> Ativar Modo Escuro</label>
             <h4>Música Ambiente</h4>
             <input type="text" placeholder="Link do YouTube (embed)">
         </div>
     </section>
 
-    <!-- Configurações -->
     <section id="config" class="tab">
         <div class="card">
             <h2>⚙️ Configurações</h2>
             <h4>Integração JSONBIN</h4>
-            <input type="text" placeholder="Seu BIN ID" value="68db6557ae596e708f00b490">
-            <input type="password" placeholder="Sua Master Key">
+            <input type="text" id="binId" placeholder="Seu BIN ID" value="68db6557ae596e708f00b490">
+            <input type="password" id="masterKey" placeholder="Sua Master Key (X-Master-Key)">
             <h4>Ações</h4>
             <div class="form-buttons">
-                <button>Salvar</button>
-                <button class="btn-primary">Publicar no Totem</button>
+                <button id="btnPublicar" class="btn-primary">Publicar no Totem</button>
                 <button class="btn-secondary">Exportar JSON</button>
                 <button class="btn-secondary">Importar JSON</button>
-                <button class="btn-danger">Restaurar Padrão</button>
+                <button id="btnRestaurarPadrao" class="btn-danger">Restaurar Padrão</button>
             </div>
         </div>
     </section>
-
 </main>
 
 <script src="painel.js"></script>
 </body>
-              </html>
+</html>
