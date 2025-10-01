@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>Painel SEUNEGOCIO - Gestão Completa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="painel.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Painel de Gestão SEUNEGOCIO</h1>
+    <p>O controle completo do seu negócio em um só lugar.</p>
+</header>
+
+<nav id="menu"></nav>
+
+<main>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="tab">
+        <div class="card">
+            <h2>📊 Dashboard</h2>
+            <div class="filters">
+                <select id="periodoFiltro">
+                    <option value="dia">Hoje</option>
+                    <option value="semana">Esta Semana</option>
+                    <option value="mes">Este Mês</option>
+                </select>
+            </div>
+            <div class="grid-container">
+                <div class="summary-card">
+                    <h4>Total de Vendas</h4>
+                    <p>R$ 0,00</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Total de Pedidos</h4>
+                    <p>0</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Novos Clientes</h4>
+                    <p>0</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Produto Mais Vendido</h4>
+                    <p>-</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="vendasChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categorias -->
+    <section id="categorias" class="tab">
+        <div class="card">
+            <h2>🗂️ Categorias e Subcategorias</h2>
+            <div class="form-group">
+                <input type="text" placeholder="Nome da Nova Categoria">
+                <button>Criar Categoria</button>
+            </div>
+            <div id="category-tree"></div>
+        </div>
+    </section>
+
+    <!-- Produtos -->
+    <section id="produtos" class="tab">
+        <div class="card">
+            <h2>📦 Produtos</h2>
+            <div class="grid-container cols-3">
+                <input type="text" placeholder="Nome do Produto">
+                <input type="number" placeholder="Preço (R$)">
+                <input type="text" placeholder="URL da Imagem">
+                <select><option>Categoria</option></select>
+                <select><option>Subcategoria</option></select>
+                <select><option>Modo de Venda</option></select>
+                <input type="number" placeholder="Estoque">
+                <label><input type="checkbox"> Destaque</label>
+                <label><input type="checkbox"> Ativo</label>
+            </div>
+            <textarea placeholder="Descrição do produto"></textarea>
+            <div class="form-buttons">
+                <button>Criar Produto</button>
+                <button>Salvar Edição</button>
+            </div>
+            <hr>
+            <h3>Lista de Produtos</h3>
+            <div id="lista-produtos"></div>
+        </div>
+    </section>
+
+    <!-- Clientes -->
+    <section id="clientes" class="tab">
+        <div class="card">
+            <h2>👥 Clientes</h2>
+            <div class="grid-container cols-2">
+                <input type="text" placeholder="Nome do Cliente">
+                <input type="tel" placeholder="Telefone">
+                <input type="text" placeholder="Endereço">
+                <input type="text" placeholder="Bairro">
+            </div>
+            <textarea placeholder="Histórico e observações..."></textarea>
+            <label><input type="checkbox"> Permitir notificações</label>
+            <div class="form-buttons"><button>Salvar Cliente</button></div>
+            <hr>
+            <h3>Lista de Clientes</h3>
+            <div id="lista-clientes"></div>
+        </div>
+    </section>
+
+    <!-- Cupons -->
+    <section id="cupons" class="tab">
+        <div class="card">
+            <h2>🎟️ Cupons</h2>
+            <div class="grid-container cols-3">
+                <input type="text" placeholder="Código (Ex: PROMO10)">
+                <select><option>Tipo de Desconto (% ou R$)</option></select>
+                <input type="number" placeholder="Valor do Desconto">
+                <input type="date" title="Validade">
+                <input type="number" placeholder="Valor mínimo de compra">
+                <input type="number" placeholder="Limite de uso">
+            </div>
+            <textarea placeholder="Mensagem promocional"></textarea>
+            <label><input type="checkbox"> Ativo</label>
+            <div class="form-buttons"><button>Criar Cupom</button></div>
+            <hr>
+            <h3>Cupons Ativos</h3>
+            <div id="lista-cupons"></div>
+        </div>
+    </section>
+
+    <!-- Publicidade -->
+    <section id="publicidade" class="tab">
+        <div class="card">
+            <h2>📢 Publicidade</h2>
+            <h4>Banner Principal</h4>
+            <input type="text" placeholder="Texto do banner">
+            <input type="text" placeholder="URL da imagem">
+            <input type="text" placeholder="Link de destino">
+            <h4>Carrossel de Imagens</h4>
+            <textarea placeholder="URLs das imagens, uma por linha"></textarea>
+            <h4>Redes Sociais</h4>
+            <input type="text" placeholder="Link do Instagram">
+            <input type="text" placeholder="Link do Facebook">
+            <input type="text" placeholder="Número do WhatsApp">
+            <div class="form-buttons"><button>Salvar Publicidade</button></div>
+        </div>
+    </section>
+
+    <!-- Dados da Loja -->
+    <section id="dados-loja" class="tab">
+        <div class="card">
+            <h2>🗝️ Dados da Loja</h2>
+            <div class="grid-container cols-2">
+                <input type="text" placeholder="Nome da Loja">
+                <input type="tel" placeholder="Telefone Principal">
+                <input type="text" placeholder="Chave PIX">
+                <input type="text" placeholder="Dados Bancários">
+                <input type="text" placeholder="Endereço Físico">
+                <input type="text" placeholder="URL do Logo">
+            </div>
+            <textarea placeholder="Horários de funcionamento"></textarea>
+        </div>
+    </section>
+
+    <!-- Cobertura -->
+    <section id="cobertura" class="tab">
+        <div class="card">
+            <h2>🗺️ Cobertura de Entrega</h2>
+            <div class="grid-container cols-3">
+                <input type="text" placeholder="Nome do Bairro">
+                <input type="number" placeholder="Taxa de Entrega (R$)">
+                <input type="text" placeholder="Tempo Estimado (min)">
+            </div>
+            <div class="form-buttons"><button>Adicionar Bairro</button></div>
+            <hr>
+            <h3>Bairros Cadastrados</h3>
+            <div id="lista-bairros"></div>
+        </div>
+    </section>
+
+    <!-- Customização -->
+    <section id="customizar" class="tab">
+        <div class="card">
+            <h2>🎨 Customizar</h2>
+            <h4>Visual</h4>
+            <input type="color" title="Cor Principal">
+            <input type="text" placeholder="Fonte (Ex: Roboto)">
+            <h4>Segurança</h4>
+            <label><input type="checkbox"> Ativar Modo Escuro</label>
+            <h4>Música Ambiente</h4>
+            <input type="text" placeholder="Link do YouTube (embed)">
+        </div>
+    </section>
+
+    <!-- Configurações -->
+    <section id="config" class="tab">
+        <div class="card">
+            <h2>⚙️ Configurações</h2>
+            <h4>Integração JSONBIN</h4>
+            <input type="text" placeholder="Seu BIN ID" value="68db6557ae596e708f00b490">
+            <input type="password" placeholder="Sua Master Key">
+            <h4>Ações</h4>
+            <div class="form-buttons">
+                <button>Salvar</button>
+                <button class="btn-primary">Publicar no Totem</button>
+                <button class="btn-secondary">Exportar JSON</button>
+                <button class="btn-secondary">Importar JSON</button>
+                <button class="btn-danger">Restaurar Padrão</button>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script src="painel.js"></script>
+</body>
+              </html>
