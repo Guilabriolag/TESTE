@@ -828,6 +828,103 @@ document.addEventListener('DOMContentLoaded', () => {
     gerenciarSubcategorias(e);
     removerCategoria(e);
   });
+// ================================
+// 🔄 Preview em tempo real do Totem
+// ================================
+
+function atualizarPreview() {
+  const iframe = document.getElementById("previewIframe");
+  if (!iframe) return;
+
+  // força recarregar o totem.html do estado atual
+  const html = gerarTotemHTML();
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+}
+
+// Função que gera o HTML do Totem baseado no state
+function gerarTotemHTML() {
+  return `
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Totem - SeuNegócio</title>
+    <style>
+      body { font-family: Arial, sans-serif; background:#fafafa; margin:0; }
+      header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#3498db; color:#fff; }
+      header img { height:50px; border-radius:6px; }
+      #banner { text-align:center; padding:15px; }
+      #banner img { max-width:100%; border-radius:10px; }
+      #carrossel { display:flex; overflow-x:auto; gap:10px; padding:10px; }
+      #carrossel img { height:100px; border-radius:8px; }
+      #produtos { padding:15px; }
+      .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:15px; }
+      .produto-card { background:#fff; padding:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); text-align:center; }
+      .produto-card img { width:100%; height:120px; object-fit:cover; border-radius:8px; }
+      .produto-card h3 { margin:10px 0 5px; font-size:16px; }
+      .produto-card p { font-size:13px; color:#555; }
+      .produto-card .preco { font-weight:bold; color:#e74c3c; display:block; margin-top:5px; }
+      footer { text-align:center; padding:10px; background:#ecf0f1; font-size:14px; color:#555; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <img src="${state.dadosLoja?.logo || ""}" alt="Logo">
+        <h1>${state.dadosLoja?.nome || "Minha Loja"}</h1>
+      </div>
+      <div>
+        <span>${state.dadosLoja?.telefone || ""}</span><br>
+        <span>${state.dadosLoja?.pix || ""}</span>
+      </div>
+    </header>
+
+    <main>
+      <section id="banner">
+        <h2>${state.publicidade?.texto || ""}</h2>
+        ${state.publicidade?.bannerImg ? `<img src="${state.publicidade.bannerImg}" alt="Banner">` : ""}
+      </section>
+
+      <section id="carrossel">
+        ${(state.publicidade?.carrossel || []).map(url => `<img src="${url}" alt="Carrossel">`).join("")}
+      </section>
+
+      <section id="produtos">
+        <h2>Produtos</h2>
+        <div class="grid">
+          ${(state.produtos || []).filter(p => p.ativo).map(prod => `
+            <div class="produto-card">
+              <img src="${prod.imagem}" alt="${prod.nome}">
+              <h3>${prod.nome}</h3>
+              <p>${prod.descricao || ""}</p>
+              <span class="preco">R$ ${prod.preco}</span>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>${state.dadosLoja?.endereco || ""}</p>
+      <p>${state.dadosLoja?.horario || ""}</p>
+    </footer>
+  </body>
+  </html>
+  `;
+}
+
+// Sempre que salvar algo → atualizar Preview
+function atualizarTudo() {
+  salvarState();
+  atualizarPreview();
+}
+
+// Chama uma vez ao abrir
+document.addEventListener("DOMContentLoaded", atualizarPreview);
 
   // Inicialização de render
   setupTabs();
