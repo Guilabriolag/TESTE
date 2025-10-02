@@ -2,134 +2,41 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Totem - SeuNegócio</title>
+  <title>Totem</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #fafafa;
-      color: #333;
-      text-align: center;
-      padding: 20px;
-    }
-    header {
-      background: #3498db;
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    header img {
-      height: 50px;
-      border-radius: 6px;
-    }
-    .produto-card {
-      background: #fff;
-      padding: 10px;
-      margin: 10px;
-      display: inline-block;
-      width: 180px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      vertical-align: top;
-    }
-    .produto-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-    .preco {
-      font-weight: bold;
-      color: #e74c3c;
-      display: block;
-      margin-top: 5px;
-    }
-    footer {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #555;
-    }
+    body { font-family: Arial, sans-serif; background:#f0f0f0; padding:20px; }
+    pre { background:#fff; padding:15px; border-radius:8px; }
   </style>
 </head>
 <body>
-  <header>
-    <img id="lojaLogo" src="" alt="Logo">
-    <h1 id="lojaNome">Carregando...</h1>
-    <p id="lojaTelefone"></p>
-    <p id="lojaPix"></p>
-  </header>
-
-  <main id="totemContent">
-    <p>Carregando informações...</p>
-  </main>
-
-  <footer>
-    <p id="lojaEndereco"></p>
-    <p id="lojaHorario"></p>
-  </footer>
+  <h1>📢 Totem do Cliente</h1>
+  <div id="conteudo">Carregando...</div>
 
   <script>
-    // Pega o BinID da URL (ex: totem.html?bin=SEU_ID_AQUI)
     const urlParams = new URLSearchParams(window.location.search);
     const binId = urlParams.get("bin");
 
     if (!binId) {
-      document.getElementById("totemContent").innerHTML =
-        "<p style='color:red'>❌ Nenhum BinID informado.<br>Use a URL assim: <br><b>totem.html?bin=SEU_BIN_ID</b></p>";
-      throw new Error("BinID não encontrado na URL");
+      document.getElementById("conteudo").innerText = "⚠️ Nenhum binId informado na URL.";
+    } else {
+      fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`)
+        .then(res => {
+          if (!res.ok) throw new Error("Falha ao carregar");
+          return res.json();
+        })
+        .then(json => {
+          // Aqui você pode renderizar os produtos do cliente
+          const dados = json.record;
+          document.getElementById("conteudo").innerHTML = `
+            <h2>${dados.nomeLoja}</h2>
+            <pre>${JSON.stringify(dados, null, 2)}</pre>
+          `;
+        })
+        .catch(err => {
+          document.getElementById("conteudo").innerText = "❌ Erro ao carregar dados do Totem.";
+          console.error(err);
+        });
     }
-
-    const apiUrl = `https://api.jsonbin.io/v3/b/${binId}/latest`;
-
-    async function carregarTotem() {
-      try {
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("Erro ao buscar dados do Totem");
-
-        const json = await res.json();
-        const state = json.record;
-
-        // Preenche dados da loja
-        document.getElementById("lojaNome").textContent = state.loja?.nome || "Minha Loja";
-        document.getElementById("lojaTelefone").textContent = state.loja?.telefone || "";
-        document.getElementById("lojaPix").textContent = state.loja?.pix || "";
-        document.getElementById("lojaEndereco").textContent = state.loja?.endereco || "";
-        document.getElementById("lojaHorario").textContent = state.loja?.horario || "";
-        if (state.loja?.logo) {
-          document.getElementById("lojaLogo").src = state.loja.logo;
-        }
-
-        // Lista produtos
-        const container = document.getElementById("totemContent");
-        container.innerHTML = "";
-        if (state.produtos?.length) {
-          state.produtos.forEach(prod => {
-            if (prod.ativo) {
-              const card = document.createElement("div");
-              card.className = "produto-card";
-              card.innerHTML = `
-                <img src="${prod.imagem}" alt="${prod.nome}">
-                <h3>${prod.nome}</h3>
-                <p>${prod.descricao || ""}</p>
-                <span class="preco">R$ ${prod.preco}</span>
-              `;
-              container.appendChild(card);
-            }
-          });
-        } else {
-          container.innerHTML = "<p>Nenhum produto disponível.</p>";
-        }
-      } catch (err) {
-        console.error("Erro ao carregar Totem:", err);
-        document.getElementById("totemContent").innerHTML =
-          "<p style='color:red'>Erro ao carregar dados do Totem.</p>";
-      }
-    }
-
-    carregarTotem();
-    setInterval(carregarTotem, 60000); // atualiza a cada 1 minuto
   </script>
 </body>
 </html>
