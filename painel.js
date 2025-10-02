@@ -828,6 +828,41 @@ document.addEventListener('DOMContentLoaded', () => {
     gerenciarSubcategorias(e);
     removerCategoria(e);
   });
+  // Função para publicar no Totem via JSONBin
+function publicarTotem() {
+    const binId = document.getElementById("jsonbinId").value.trim();
+    const masterKey = document.getElementById("masterKey").value.trim();
+
+    if (!binId || !masterKey) {
+        alert("⚠️ Configure o JSONBin ID e a Master Key antes de publicar!");
+        return;
+    }
+
+    // Pega todos os dados salvos no state
+    const data = JSON.stringify(state);
+
+    fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": masterKey
+        },
+        body: data
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Erro ao publicar no JSONBin");
+        return res.json();
+    })
+    .then(json => {
+        alert("✅ Publicado com sucesso no Totem!");
+        console.log("Resposta JSONBin:", json);
+    })
+    .catch(err => {
+        console.error("Erro:", err);
+        alert("❌ Falha ao publicar no Totem. Verifique suas credenciais.");
+    });
+}
+
 // ================================
 // 🔄 Preview em tempo real do Totem
 // ================================
