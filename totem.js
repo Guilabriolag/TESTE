@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- CONFIG ---
   // ATENÇÃO: Estes dados devem ser os mesmos do seu painel.
-  const BIN_ID = '68db6557ae596e708f00b490';
-  const API_KEY = '$2a$10$tjnnaauKPcx3meNHOAbLnefskEWrEHoUCjB1Q0A2WdjUodgzxGpJG';
+  const BIN_ID = '68de4a73d0ea881f40929dca';
+  const API_KEY = '$2a$10$GOducLqAZIq2MZScJ2RNRON5lbkQx0SSfNc5/nJQQ/pFsRtAsBRtK';
   const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
   // --- SELECTORS ---
