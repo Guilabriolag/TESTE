@@ -1,15 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-function renderModos() {
-const ul = $('#listaModosVenda');
-const sel = $('#prodModoVenda');
-ul.innerHTML = ''; sel.innerHTML = '<option value="">Modo de Venda</option>';
-state.modosVenda.forEach(m => {
-const li = document.createElement('li'); li.textContent = `${m.nome} ${m.fracao || ''}`;
-ul.appendChild(li);
-const opt = document.createElement('option'); opt.value = m.id; opt.textContent = m.nome; sel.appendChild(opt);
-});
-}
-function addModo(nome, fracao) { state.modosVenda.push({ id: genId(), nome, fracao }); saveState(); renderAll(); }
 // ================================================================
 // PAINEL SEUNEGOCIO - Gestão Completa
 // ================================================================
