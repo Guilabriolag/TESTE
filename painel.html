@@ -179,6 +179,87 @@
       </section>
     </main>
   </div>
+<script>
+// Estado inicial da loja
+let state = {
+    loja: {
+        nome: "",
+        logo: "",
+        corPrimaria: "#000000"
+    },
+    produtos: [],
+    clientes: [],
+    publicidade: {
+        texto: "",
+        imagens: [],
+        redesSociais: []
+    }
+};
+
+// =========================
+// Funções utilitárias
+// =========================
+
+// Salvar estado no navegador (localStorage)
+function salvarLocal() {
+    localStorage.setItem("painelState", JSON.stringify(state));
+    alert("💾 Configurações salvas no dispositivo!");
+}
+
+// Carregar estado salvo no navegador
+function carregarLocal() {
+    const saved = localStorage.getItem("painelState");
+    if (saved) {
+        state = JSON.parse(saved);
+        console.log("🔄 Estado carregado:", state);
+        alert("✅ Configurações carregadas!");
+    }
+}
+
+// =========================
+// Publicar no Totem via JSONBin
+// =========================
+function publicarTotem() {
+    const binId = document.getElementById("jsonbinId").value.trim();
+    const masterKey = document.getElementById("masterKey").value.trim();
+
+    if (!binId || !masterKey) {
+        alert("⚠️ Configure o JSONBin ID e a Master Key antes de publicar!");
+        return;
+    }
+
+    // Dados atuais da loja
+    const data = JSON.stringify(state);
+
+    fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": masterKey
+        },
+        body: data
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Erro ao publicar no JSONBin");
+        return res.json();
+    })
+    .then(json => {
+        alert("✅ Publicado com sucesso no Totem!");
+        console.log("Resposta JSONBin:", json);
+    })
+    .catch(err => {
+        console.error("Erro:", err);
+        alert("❌ Falha ao publicar no Totem. Verifique suas credenciais.");
+    });
+}
+
+// =========================
+// Inicialização
+// =========================
+window.onload = function() {
+    carregarLocal();
+};
+</script>
 
   <script src="painel.js"></script>
 </body>
