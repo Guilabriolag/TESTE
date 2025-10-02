@@ -196,3 +196,80 @@ button {
     grid-template-columns: 1fr;
   }
 }
+/* =======================
+   Sidebar collapsible styles
+   ======================= */
+
+#sidebar {
+  transition: width 0.16s ease, background 0.16s ease;
+  overflow: visible;
+  position: relative;
+}
+
+/* Toggle button estilo */
+#sidebarToggle {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #ecf0f1;
+  font-size: 18px;
+  padding: 8px 0;
+  cursor: pointer;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+/* Estrutura interna dos botões do menu (icon + label) */
+#menu button .menu-icon {
+  display: inline-block;
+  width: 28px;
+  text-align: center;
+  margin-right: 8px;
+  font-size: 16px;
+}
+#menu button .menu-label {
+  vertical-align: middle;
+}
+
+/* Estado COLAPSED: largura menor, esconde os textos */
+#sidebar.collapsed {
+  width: 64px !important;
+}
+#sidebar.collapsed h2 {
+  display: none;
+}
+#sidebar.collapsed #menu button {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+#sidebar.collapsed #menu button .menu-label {
+  display: none;
+}
+#sidebar.collapsed #menu button .menu-icon {
+  margin-right: 0;
+}
+
+/* Tooltip para botões quando colapsado */
+#sidebar.collapsed #menu button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 70px;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 2000;
+  transform: translateY(-50%);
+  top: 50%;
+  font-size: 13px;
+}
+
+/* Ajuste responsivo: manter funcionando bem em telas pequenas */
+@media (max-width: 768px) {
+  #sidebar.collapsed {
+    width: 56px !important;
+  }
+}
