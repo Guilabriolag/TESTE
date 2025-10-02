@@ -971,6 +971,163 @@ document.addEventListener("DOMContentLoaded", atualizarPreview);
   renderizarCobertura();
   renderizarModoVenda();
   atualizarPreview();
+// =========================
+// Estado inicial da loja
+// =========================
+let state = {
+  dadosLoja: {
+    nome: "",
+    logo: "",
+    telefone: "",
+    pix: "",
+    banco: "",
+    endereco: "",
+    horario: "",
+    corPrimaria: "#3498db"
+  },
+  produtos: [],
+  clientes: [],
+  cupons: [],
+  publicidade: {
+    texto: "",
+    bannerImg: "",
+    bannerLink: "",
+    carrossel: [],
+    redesSociais: {
+      instagram: "",
+      facebook: "",
+      whatsapp: ""
+    }
+  },
+  cobertura: [],
+  customizacao: {
+    corPrimaria: "#3498db",
+    fonte: "Arial",
+    modoEscuro: false,
+    musicaAmbiente: ""
+  }
+};
+
+// =========================
+// Utilitários LocalStorage
+// =========================
+function salvarLocal() {
+  localStorage.setItem("painelState", JSON.stringify(state));
+  alert("💾 Configurações salvas no dispositivo!");
+}
+
+function carregarLocal() {
+  const saved = localStorage.getItem("painelState");
+  if (saved) {
+    state = JSON.parse(saved);
+    console.log("🔄 Estado carregado:", state);
+  }
+}
+
+// =========================
+// Funções JSONBin
+// =========================
+async function publicarTotem() {
+  const binId = document.getElementById("jsonbinId").value.trim();
+  const masterKey = document.getElementById("masterKey").value.trim();
+
+  if (!binId || !masterKey) {
+    alert("⚠️ Configure o JSONBin ID e a Master Key antes de publicar!");
+    return;
+  }
+
+  salvarLocal(); // garante que localStorage está atualizado
+
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": masterKey
+      },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) throw new Error("Erro ao publicar no JSONBin");
+    const json = await res.json();
+    console.log("✅ Publicado no JSONBin:", json);
+    alert("✅ Publicado com sucesso no Totem!");
+  } catch (err) {
+    console.error("❌ Falha ao publicar no JSONBin:", err);
+    alert("❌ Falha ao publicar no Totem. Verifique suas credenciais.");
+  }
+}
+
+async function importarDoTotem() {
+  const binId = document.getElementById("jsonbinId").value.trim();
+  const masterKey = document.getElementById("masterKey").value.trim();
+
+  if (!binId || !masterKey) {
+    alert("⚠️ Configure o JSONBin ID e a Master Key antes de importar!");
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      method: "GET",
+      headers: { "X-Master-Key": masterKey }
+    });
+    if (!res.ok) throw new Error("Erro ao importar do JSONBin");
+    const json = await res.json();
+    state = json.record;
+    salvarLocal();
+    alert("✅ Dados importados do Totem com sucesso!");
+    console.log("🔄 Estado importado:", state);
+  } catch (err) {
+    console.error("❌ Falha ao importar:", err);
+    alert("❌ Falha ao importar do Totem.");
+  }
+}
+
+// =========================
+// Funções para gerenciar abas e dados
+// =========================
+function adicionarProduto(prod) {
+  state.produtos.push(prod);
+  salvarLocal();
+  alert("Produto adicionado!");
+  renderizarProdutos();
+}
+
+function renderizarProdutos() {
+  const container = document.getElementById("listaProdutosContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  state.produtos.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "produto-card";
+    div.innerHTML = `
+      <h3>${p.nome}</h3>
+      <img src="${p.imagem}" alt="${p.nome}">
+      <p>${p.descricao}</p>
+      <span>R$ ${p.preco}</span>
+      <button onclick="removerProduto(${i})">❌ Remover</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function removerProduto(index) {
+  if (confirm("Remover este produto?")) {
+    state.produtos.splice(index, 1);
+    salvarLocal();
+    renderizarProdutos();
+  }
+}
+
+// Funções similares podem ser criadas para clientes, cupons, publicidade, cobertura etc.
+
+// =========================
+// Inicialização
+// =========================
+window.onload = function() {
+  carregarLocal();
+  renderizarProdutos();
+};
 
   // Debug rápido: mostra erro no console se algo falhar ao carregar
   window.addEventListener('error', (ev) => {
