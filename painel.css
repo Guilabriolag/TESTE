@@ -2,7 +2,7 @@
    Painel Administrativo - SeuNegócio
    ============================= */
 
-/* Layout principal */
+/* Reset / base */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,13 +22,29 @@ body {
   width: 220px;
   background: #2c3e50;
   color: #ecf0f1;
-  padding: 20px;
+  padding: 20px 10px;
   box-sizing: border-box;
+  transition: width 0.16s ease, background 0.16s ease;
+  position: relative;
 }
 
 #sidebar h2 {
   margin: 0 0 20px 0;
   font-size: 20px;
+  text-align: center;
+}
+
+/* Toggle do menu */
+#sidebarToggle {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #ecf0f1;
+  font-size: 18px;
+  padding: 8px 0;
+  cursor: pointer;
+  margin-bottom: 6px;
   text-align: center;
 }
 
@@ -48,6 +64,9 @@ body {
   cursor: pointer;
   border-radius: 6px;
   transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #menu button:hover {
@@ -58,6 +77,56 @@ body {
 #menu button.active {
   background: #3498db;
   color: #fff;
+}
+
+#menu button .menu-icon {
+  display: inline-block;
+  width: 24px;
+  text-align: center;
+  font-size: 16px;
+}
+
+#menu button .menu-label {
+  flex: 1;
+}
+
+/* Sidebar colapsada */
+#sidebar.collapsed {
+  width: 64px !important;
+}
+
+#sidebar.collapsed h2 {
+  display: none;
+}
+
+#sidebar.collapsed #menu button {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#sidebar.collapsed #menu button .menu-label {
+  display: none;
+}
+
+#sidebar.collapsed #menu button .menu-icon {
+  margin-right: 0;
+}
+
+/* Tooltip quando colapsado */
+#sidebar.collapsed #menu button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 70px;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 2000;
+  transform: translateY(-50%);
+  top: 50%;
+  font-size: 13px;
 }
 
 /* Conteúdo principal */
@@ -79,7 +148,6 @@ main {
   display: block;
 }
 
-/* Títulos */
 .tab h2 {
   margin-top: 0;
   margin-bottom: 15px;
@@ -155,7 +223,7 @@ button {
   font-size: 12px;
 }
 
-/* Listas de itens */
+/* Listas */
 #listaProdutosContainer .product-item,
 .cliente-item,
 .cupom-item,
@@ -192,84 +260,10 @@ button {
     width: 180px;
     padding: 15px;
   }
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
-/* =======================
-   Sidebar collapsible styles
-   ======================= */
-
-#sidebar {
-  transition: width 0.16s ease, background 0.16s ease;
-  overflow: visible;
-  position: relative;
-}
-
-/* Toggle button estilo */
-#sidebarToggle {
-  display: block;
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: #ecf0f1;
-  font-size: 18px;
-  padding: 8px 0;
-  cursor: pointer;
-  margin-bottom: 6px;
-  text-align: center;
-}
-
-/* Estrutura interna dos botões do menu (icon + label) */
-#menu button .menu-icon {
-  display: inline-block;
-  width: 28px;
-  text-align: center;
-  margin-right: 8px;
-  font-size: 16px;
-}
-#menu button .menu-label {
-  vertical-align: middle;
-}
-
-/* Estado COLAPSED: largura menor, esconde os textos */
-#sidebar.collapsed {
-  width: 64px !important;
-}
-#sidebar.collapsed h2 {
-  display: none;
-}
-#sidebar.collapsed #menu button {
-  justify-content: center;
-  padding-left: 0;
-  padding-right: 0;
-}
-#sidebar.collapsed #menu button .menu-label {
-  display: none;
-}
-#sidebar.collapsed #menu button .menu-icon {
-  margin-right: 0;
-}
-
-/* Tooltip para botões quando colapsado */
-#sidebar.collapsed #menu button[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  left: 70px;
-  background: rgba(0,0,0,0.85);
-  color: #fff;
-  padding: 6px 8px;
-  border-radius: 6px;
-  white-space: nowrap;
-  z-index: 2000;
-  transform: translateY(-50%);
-  top: 50%;
-  font-size: 13px;
-}
-
-/* Ajuste responsivo: manter funcionando bem em telas pequenas */
-@media (max-width: 768px) {
   #sidebar.collapsed {
     width: 56px !important;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 }
