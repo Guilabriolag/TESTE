@@ -159,21 +159,14 @@
 
       <!-- Configurações -->
       <section id="config" class="tab">
-        <h2>⚙️ Configurações</h2>
-        <div class="form-grid">
-          <input id="binId" type="text" placeholder="JSONBin ID">
-          <input id="masterKey" type="password" placeholder="Master Key">
-        </div>
-        <button id="btnPublicar" class="btn-primary">Publicar no Totem</button>
-        <button class="btn-secondary">Importar do Totem</button>
-        <button id="btnRestaurarPadrao" class="btn-danger">Restaurar Padrão</button>
-      <h3>⚙️ Configurações JSONBin</h3>
+        <h3>⚙️ Configurações JSONBin</h3>
 <label for="jsonbinId">JSONBin ID:</label>
 <input type="text" id="jsonbinId" placeholder="Insira seu JSONBin ID">
 
 <label for="masterKey">Master Key:</label>
 <input type="password" id="masterKey" placeholder="Insira sua Master Key">
 
+<button onclick="salvarLocal()">💾 Salvar no dispositivo</button>
 <button onclick="publicarTotem()">📤 Publicar no Totem</button>
 
       </section>
