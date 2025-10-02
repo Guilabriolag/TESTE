@@ -142,74 +142,64 @@
   </footer>
 
   <script>
-    // ======= DADOS DE TESTE =======
-    const state = {
-      dadosLoja: {
-        nome: "Loja Teste",
-        telefone: "1234-5678",
-        pix: "00011122233",
-        endereco: "Rua Exemplo, 123",
-        horario: "08:00 - 18:00",
-        logo: "https://via.placeholder.com/80"
-      },
-      publicidade: {
-        texto: "Promoção da semana!",
-        bannerImg: "https://via.placeholder.com/600x200",
-        carrossel: [
-          "https://via.placeholder.com/100",
-          "https://via.placeholder.com/100/ff0000",
-          "https://via.placeholder.com/100/00ff00"
-        ]
-      },
-      produtos: [
-        { nome: "Produto 1", descricao: "Descrição 1", preco: 25, imagem: "https://via.placeholder.com/180", ativo: true },
-        { nome: "Produto 2", descricao: "Descrição 2", preco: 50, imagem: "https://via.placeholder.com/180/ff0", ativo: true },
-        { nome: "Produto 3", descricao: "Descrição 3", preco: 75, imagem: "https://via.placeholder.com/180/0ff", ativo: true }
-      ]
-    };
+    // ======= Totem SEUNEGOCIO =======
+    // Puxa dados salvos no painel
+    const state = JSON.parse(localStorage.getItem("seunegocio_state")) || {};
 
-    // ================= FUNÇÃO DE ATUALIZAÇÃO ==================
+    // Função para atualizar todos os elementos
     function atualizarTotem() {
       // Dados da loja
-      document.getElementById("lojaNome").textContent = state.dadosLoja.nome;
-      document.getElementById("lojaTelefone").textContent = state.dadosLoja.telefone;
-      document.getElementById("lojaPix").textContent = state.dadosLoja.pix;
-      document.getElementById("lojaEndereco").textContent = state.dadosLoja.endereco;
-      document.getElementById("lojaHorario").textContent = state.dadosLoja.horario;
-      document.getElementById("lojaLogo").src = state.dadosLoja.logo;
+      document.getElementById("lojaNome").textContent = state.dadosLoja?.nome || "Minha Loja";
+      document.getElementById("lojaTelefone").textContent = state.dadosLoja?.telefone || "";
+      document.getElementById("lojaPix").textContent = state.dadosLoja?.pix || "";
+      document.getElementById("lojaEndereco").textContent = state.dadosLoja?.endereco || "";
+      document.getElementById("lojaHorario").textContent = state.dadosLoja?.horario || "";
+      if (state.dadosLoja?.logo) {
+        document.getElementById("lojaLogo").src = state.dadosLoja.logo;
+      } else {
+        document.getElementById("lojaLogo").src = "";
+      }
 
       // Banner
-      document.getElementById("bannerTexto").textContent = state.publicidade.texto;
-      document.getElementById("bannerImagem").src = state.publicidade.bannerImg;
+      document.getElementById("bannerTexto").textContent = state.publicidade?.texto || "";
+      if (state.publicidade?.bannerImg) {
+        document.getElementById("bannerImagem").src = state.publicidade.bannerImg;
+      } else {
+        document.getElementById("bannerImagem").src = "";
+      }
 
       // Carrossel
       const carrossel = document.getElementById("carrosselContainer");
       carrossel.innerHTML = "";
-      state.publicidade.carrossel.forEach(url => {
-        const img = document.createElement("img");
-        img.src = url;
-        carrossel.appendChild(img);
-      });
+      if (state.publicidade?.carrossel?.length) {
+        state.publicidade.carrossel.forEach(url => {
+          const img = document.createElement("img");
+          img.src = url;
+          carrossel.appendChild(img);
+        });
+      }
 
       // Produtos
       const produtosContainer = document.getElementById("produtosContainer");
       produtosContainer.innerHTML = "";
-      state.produtos.forEach(prod => {
-        if (prod.ativo) {
-          const card = document.createElement("div");
-          card.className = "produto-card";
-          card.innerHTML = `
-            <img src="${prod.imagem}" alt="${prod.nome}">
-            <h3>${prod.nome}</h3>
-            <p>${prod.descricao}</p>
-            <span class="preco">R$ ${prod.preco}</span>
-          `;
-          produtosContainer.appendChild(card);
-        }
-      });
+      if (state.produtos?.length) {
+        state.produtos.forEach(prod => {
+          if (prod.ativo) {
+            const card = document.createElement("div");
+            card.className = "produto-card";
+            card.innerHTML = `
+              <img src="${prod.imagem}" alt="${prod.nome}">
+              <h3>${prod.nome}</h3>
+              <p>${prod.descricao || ""}</p>
+              <span class="preco">R$ ${prod.preco}</span>
+            `;
+            produtosContainer.appendChild(card);
+          }
+        });
+      }
     }
 
-    // Inicializar Totem
+    // Inicializa Totem
     atualizarTotem();
   </script>
 </body>
