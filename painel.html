@@ -1,82 +1,176 @@
 <!DOCTYPE html>
-<div id="category-tree"></div>
-</section>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - SeuNegócio</title>
+  <link rel="stylesheet" href="painel.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Menu lateral -->
+    <aside id="sidebar">
+      <h2>SeuNegócio</h2>
+      <nav id="menu"></nav>
+    </aside>
 
+    <!-- Conteúdo -->
+    <main>
+      <!-- Dashboard -->
+      <section id="dashboard" class="tab active">
+        <h2>📊 Dashboard</h2>
+        <canvas id="vendasChart"></canvas>
+      </section>
 
-<!-- Modo de Venda -->
-<section id="modo-venda" class="tab">
-<h1>⚖️ Modos de Venda</h1>
-<input id="modoVendaNome" type="text" placeholder="Nome do Modo (ex: Unidade)">
-<input id="modoVendaFracao" type="text" placeholder="Ex: ½, ¼">
-<button id="btnAdicionarModoVenda">Adicionar Modo</button>
-<ul id="listaModosVenda"></ul>
-</section>
+      <!-- Categorias -->
+      <section id="categorias" class="tab">
+        <h2>🗂️ Categorias</h2>
+        <div class="form-group">
+          <input type="text" placeholder="Nova Categoria">
+          <button class="btn-primary">Adicionar Categoria</button>
+        </div>
+        <div id="category-tree"></div>
+      </section>
 
+      <!-- Modo de Venda -->
+      <section id="modo-venda" class="tab">
+        <h2>⚖️ Modo de Venda</h2>
+        <div class="form-group">
+          <select>
+            <option value="Unidade">Unidade</option>
+            <option value="Kg">Kg</option>
+            <option value="Litro">Litro</option>
+            <option value="Combo">Combo</option>
+          </select>
+          <input type="text" placeholder="Ex: 500g, 1/2 dz">
+          <button class="btn-primary">Adicionar</button>
+        </div>
+      </section>
 
-<!-- Produtos -->
-<section id="produtos" class="tab">
-<h1>📦 Produtos</h1>
-<input id="prodNome" type="text" placeholder="Nome do Produto">
-<input id="prodPreco" type="text" placeholder="Preço (ex: 12,50)">
-<input id="prodImagem" type="text" placeholder="URL da Imagem">
-<select id="prodCategoria"></select>
-<select id="prodSubcategoria"></select>
-<select id="prodModoVenda"></select>
-<input id="prodDescricao" type="text" placeholder="Descrição">
-<button id="btnAdicionarProduto">Adicionar Produto</button>
-<div id="listaProdutosContainer"></div>
-</section>
+      <!-- Produtos -->
+      <section id="produtos" class="tab">
+        <h2>📦 Produtos</h2>
+        <div class="form-grid">
+          <input id="prodNome" type="text" placeholder="Nome do Produto">
+          <input id="prodPreco" type="number" step="0.01" placeholder="Preço">
+          <input id="prodImagem" type="url" placeholder="URL da Imagem">
+          <textarea id="prodDescricao" placeholder="Descrição"></textarea>
+          <select id="prodCategoria"></select>
+          <select id="prodSubcategoria"></select>
+          <select id="prodModoVenda"></select>
+          <input id="prodEstoque" type="number" placeholder="Estoque">
+          <label><input id="prodDestaque" type="checkbox"> Destaque</label>
+          <label><input id="prodAtivo" type="checkbox"> Ativo</label>
+        </div>
+        <button id="btnAdicionarProduto" class="btn-primary">Adicionar Produto</button>
+        <div id="listaProdutosContainer"></div>
+      </section>
 
+      <!-- Clientes -->
+      <section id="clientes" class="tab">
+        <h2>👥 Clientes</h2>
+        <div class="form-grid">
+          <input type="text" placeholder="Nome">
+          <input type="text" placeholder="Telefone">
+          <input type="text" placeholder="Endereço">
+          <input type="text" placeholder="Bairro">
+          <textarea placeholder="Observações"></textarea>
+          <label><input type="checkbox"> Aceita Notificações</label>
+        </div>
+        <button class="btn-primary">Salvar Cliente</button>
+      </section>
 
-<!-- Clientes -->
-<section id="clientes" class="tab">
-<h1>👥 Clientes</h1>
-<p>Em breve CRUD de clientes.</p>
-</section>
+      <!-- Cupons -->
+      <section id="cupons" class="tab">
+        <h2>🎟️ Cupons</h2>
+        <div class="form-grid">
+          <input type="text" placeholder="Código">
+          <select>
+            <option value="%">%</option>
+            <option value="R$">R$</option>
+          </select>
+          <input type="number" placeholder="Valor">
+          <input type="date" placeholder="Validade">
+          <input type="number" placeholder="Pedido Mínimo">
+          <input type="number" placeholder="Limite de Uso">
+          <textarea placeholder="Mensagem"></textarea>
+          <label><input type="checkbox"> Ativo</label>
+        </div>
+        <button class="btn-primary">Criar Cupom</button>
+      </section>
 
+      <!-- Publicidade -->
+      <section id="publicidade" class="tab">
+        <h2>📢 Publicidade</h2>
+        <div class="form-grid">
+          <input type="text" placeholder="Texto do Banner">
+          <input type="url" placeholder="URL Imagem Banner">
+          <input type="url" placeholder="Link do Banner">
+          <textarea placeholder="Links Carrossel (1 por linha)"></textarea>
+          <input type="url" placeholder="Instagram">
+          <input type="url" placeholder="Facebook">
+          <input type="url" placeholder="WhatsApp">
+        </div>
+        <button class="btn-primary">Salvar Publicidade</button>
+      </section>
 
-<!-- Cupons -->
-<section id="cupons" class="tab">
-<h1>🎟️ Cupons</h1>
-<p>Em breve CRUD de cupons.</p>
-</section>
+      <!-- Dados da Loja -->
+      <section id="dados-loja" class="tab">
+        <h2>🗝️ Dados da Loja</h2>
+        <div class="form-grid">
+          <input type="text" placeholder="Nome da Loja">
+          <input type="text" placeholder="Telefone">
+          <input type="text" placeholder="PIX">
+          <input type="text" placeholder="Banco">
+          <textarea placeholder="Endereço"></textarea>
+          <input type="url" placeholder="Logo (URL)">
+          <textarea placeholder="Horários de Funcionamento"></textarea>
+        </div>
+      </section>
 
+      <!-- Cobertura -->
+      <section id="cobertura" class="tab">
+        <h2>🗺️ Cobertura</h2>
+        <div class="form-grid">
+          <input type="text" placeholder="Bairro">
+          <input type="number" placeholder="Taxa de Entrega">
+          <input type="number" placeholder="Tempo Estimado (min)">
+        </div>
+        <button class="btn-primary">Adicionar Bairro</button>
+      </section>
 
-<!-- Publicidade -->
-<section id="publicidade" class="tab">
-<h1>📢 Publicidade</h1>
-<p>Em breve CRUD de publicidade.</p>
-</section>
+      <!-- Customizar -->
+      <section id="customizar" class="tab">
+        <h2>🎨 Customizar</h2>
+        <div class="form-grid">
+          <input type="color" value="#3498db">
+          <input type="text" placeholder="Fonte (Ex: Arial)">
+          <label><input type="checkbox"> Modo Escuro</label>
+          <input type="url" placeholder="URL Música Ambiente">
+        </div>
+      </section>
 
+      <!-- Preview -->
+      <section id="preview" class="tab">
+        <h2>🖥️ Preview em Tempo Real</h2>
+        <iframe id="previewIframe" style="width:100%;height:600px;border:1px solid #ccc;border-radius:8px;background:#fff;"></iframe>
+      </section>
 
-<!-- Dados da Loja -->
-<section id="dados-loja" class="tab">
-<h1>🗝️ Dados da Loja</h1>
-<p>Configurações da sua loja.</p>
-</section>
+      <!-- Configurações -->
+      <section id="config" class="tab">
+        <h2>⚙️ Configurações</h2>
+        <div class="form-grid">
+          <input id="binId" type="text" placeholder="JSONBin ID">
+          <input id="masterKey" type="password" placeholder="Master Key">
+        </div>
+        <button id="btnPublicar" class="btn-primary">Publicar no Totem</button>
+        <button class="btn-secondary">Importar do Totem</button>
+        <button id="btnRestaurarPadrao" class="btn-danger">Restaurar Padrão</button>
+      </section>
+    </main>
+  </div>
 
-
-<!-- Customizar -->
-<section id="customizar" class="tab">
-<h1>🎨 Customizar</h1>
-<label>Cor Principal <input type="color"></label>
-</section>
-
-
-<!-- Configurações -->
-<section id="config" class="tab">
-<h1>⚙️ Configurações</h1>
-<label>Bin ID: <input id="binId" type="text" placeholder="Digite seu BIN ID"></label>
-<label>Master Key: <input id="masterKey" type="password" placeholder="Digite sua Master Key"></label>
-<button id="btnPublicar">Publicar no Totem</button>
-<button id="btnRestaurarPadrao">Restaurar Padrão</button>
-<hr>
-<button id="btnExportarJson">Exportar JSON</button>
-<input id="fileImportJson" type="file" accept="application/json">
-</section>
-</main>
-
-
-<script src="painel.js"></script>
+  <script src="painel.js"></script>
 </body>
 </html>
