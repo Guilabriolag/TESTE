@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Totem - SeuNegócio</title>
+  <link rel="stylesheet" href="totem.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img id="lojaLogo" src="" alt="Logo da Loja">
+      <h1 id="lojaNome">Nome da Loja</h1>
+    </div>
+    <div class="dados">
+      <span id="lojaTelefone"></span>
+      <span id="lojaPix"></span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Banner -->
+    <section id="banner">
+      <div id="bannerTexto"></div>
+      <img id="bannerImagem" src="" alt="Banner">
+    </section>
+
+    <!-- Carrossel -->
+    <section id="carrossel">
+      <div id="carrosselContainer"></div>
+    </section>
+
+    <!-- Produtos -->
+    <section id="produtos">
+      <h2>Produtos</h2>
+      <div id="produtosContainer" class="grid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p id="lojaEndereco"></p>
+    <p id="lojaHorario"></p>
+  </footer>
+
+  <script>
+    // Carrega dados do localStorage
+    const state = JSON.parse(localStorage.getItem("seunegocio_state")) || {};
+
+    // Dados da Loja
+    document.getElementById("lojaNome").textContent = state.dadosLoja?.nome || "Minha Loja";
+    document.getElementById("lojaTelefone").textContent = state.dadosLoja?.telefone || "";
+    document.getElementById("lojaPix").textContent = state.dadosLoja?.pix || "";
+    document.getElementById("lojaEndereco").textContent = state.dadosLoja?.endereco || "";
+    document.getElementById("lojaHorario").textContent = state.dadosLoja?.horario || "";
+    if (state.dadosLoja?.logo) {
+      document.getElementById("lojaLogo").src = state.dadosLoja.logo;
+    }
+
+    // Banner
+    document.getElementById("bannerTexto").textContent = state.publicidade?.texto || "";
+    if (state.publicidade?.bannerImg) {
+      document.getElementById("bannerImagem").src = state.publicidade.bannerImg;
+    }
+
+    // Carrossel
+    const carrossel = document.getElementById("carrosselContainer");
+    if (state.publicidade?.carrossel?.length) {
+      state.publicidade.carrossel.forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        carrossel.appendChild(img);
+      });
+    }
+
+    // Produtos
+    const produtosContainer = document.getElementById("produtosContainer");
+    if (state.produtos?.length) {
+      state.produtos.forEach(prod => {
+        if (prod.ativo) {
+          const card = document.createElement("div");
+          card.className = "produto-card";
+          card.innerHTML = `
+            <img src="${prod.imagem}" alt="${prod.nome}">
+            <h3>${prod.nome}</h3>
+            <p>${prod.descricao || ""}</p>
+            <span class="preco">R$ ${prod.preco}</span>
+          `;
+          produtosContainer.appendChild(card);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
