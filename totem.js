@@ -1,9 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // --- CONFIG ---
-  // ATENÇÃO: Estes dados devem ser os mesmos do seu painel.
-  const BIN_ID = '68de4a73d0ea881f40929dca';
-  const API_KEY = '$2a$10$GOducLqAZIq2MZScJ2RNRON5lbkQx0SSfNc5/nJQQ/pFsRtAsBRtK';
-  const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+
 
   // --- SELECTORS ---
   const carrosselDiv = document.getElementById('carrossel');
