@@ -144,7 +144,22 @@
   <script>
     // ======= Totem SEUNEGOCIO =======
     // Puxa dados salvos no painel
-    const state = JSON.parse(localStorage.getItem("seunegocio_state")) || {};
+    const binId = "SEU_BIN_ID"; // mesmo que o comerciante configurar
+const masterKey = "SUA_MASTER_KEY"; // pode ser só leitura
+
+fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+    headers: { "X-Master-Key": masterKey }
+})
+.then(res => res.json())
+.then(json => {
+    const state = json.record;
+    console.log("Dados recebidos do JSONBin:", state);
+
+    // aqui você monta o totem com os dados (logo, produtos, banners etc.)
+})
+.catch(err => {
+    console.error("Erro ao carregar dados do JSONBin:", err);
+});
 
     // Função para atualizar todos os elementos
     function atualizarTotem() {
