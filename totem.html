@@ -1,94 +1,202 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Totem - SeuNegócio</title>
-  <link rel="stylesheet" href="totem.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Totem - SeuNegócio</title>
+<style>
+body { margin:0;font-family:Arial,sans-serif;background:#fafafa;color:#333; }
+header { display:flex; justify-content:space-between; align-items:center; background:#3498db; color:white; padding:10px 20px; }
+header .logo { display:flex; align-items:center; gap:10px; }
+header .logo img { height:50px; border-radius:6px; }
+main { padding:20px; }
+#banner { text-align:center; margin-bottom:20px; }
+#banner img { max-width:100%; border-radius:10px; }
+#carrossel { display:flex; overflow-x:auto; gap:10px; margin-bottom:20px; }
+#carrossel img { height:100px; border-radius:8px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:15px; }
+.produto-card { background:#fff; padding:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); text-align:center; }
+.produto-card img { width:100%; height:120px; object-fit:cover; border-radius:8px; }
+.produto-card h3 { margin:10px 0 5px; font-size:16px; }
+.produto-card p { font-size:13px; color:#555; }
+.produto-card .preco { font-weight:bold; color:#e74c3c; display:block; margin-top:5px; }
+footer { text-align:center; padding:10px; background:#ecf0f1; font-size:14px; color:#555; }
+input, textarea, button { padding:5px; margin:5px 0; width:100%; }
+label { font-weight:bold; margin-top:10px; display:block; }
+hr { margin:20px 0; }
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img id="lojaLogo" src="" alt="Logo da Loja">
-      <h1 id="lojaNome">Nome da Loja</h1>
-    </div>
-    <div class="dados">
-      <span id="lojaTelefone"></span>
-      <span id="lojaPix"></span>
-    </div>
-  </header>
 
-  <main>
-    <!-- Banner -->
-    <section id="banner">
-      <div id="bannerTexto"></div>
-      <img id="bannerImagem" src="" alt="Banner">
-    </section>
+<header>
+<div class="logo">
+<img id="lojaLogo" src="" alt="Logo da Loja">
+<h1 id="lojaNome">Nome da Loja</h1>
+</div>
+<div class="dados">
+<span id="lojaTelefone"></span><br>
+<span id="lojaPix"></span>
+</div>
+</header>
 
-    <!-- Carrossel -->
-    <section id="carrossel">
-      <div id="carrosselContainer"></div>
-    </section>
+<main>
+<!-- Banner -->
+<section id="banner">
+<div id="bannerTexto"></div>
+<img id="bannerImagem" src="" alt="Banner">
+</section>
 
-    <!-- Produtos -->
-    <section id="produtos">
-      <h2>Produtos</h2>
-      <div id="produtosContainer" class="grid"></div>
-    </section>
-  </main>
+<!-- Carrossel -->
+<section id="carrossel">
+<div id="carrosselContainer"></div>
+</section>
 
-  <footer>
-    <p id="lojaEndereco"></p>
-    <p id="lojaHorario"></p>
-  </footer>
+<!-- Produtos -->
+<section id="produtos">
+<h2>Produtos</h2>
+<div id="produtosContainer" class="grid"></div>
+</section>
 
-  <script>
-    // Carrega dados do localStorage
-    const state = JSON.parse(localStorage.getItem("seunegocio_state")) || {};
+<hr>
 
-    // Dados da Loja
-    document.getElementById("lojaNome").textContent = state.dadosLoja?.nome || "Minha Loja";
-    document.getElementById("lojaTelefone").textContent = state.dadosLoja?.telefone || "";
-    document.getElementById("lojaPix").textContent = state.dadosLoja?.pix || "";
-    document.getElementById("lojaEndereco").textContent = state.dadosLoja?.endereco || "";
-    document.getElementById("lojaHorario").textContent = state.dadosLoja?.horario || "";
-    if (state.dadosLoja?.logo) {
-      document.getElementById("lojaLogo").src = state.dadosLoja.logo;
+<!-- Painel de edição -->
+<h2>Editar Loja</h2>
+<label>Nome</label><input id="inputNome" type="text">
+<label>Telefone</label><input id="inputTelefone" type="text">
+<label>PIX</label><input id="inputPix" type="text">
+<label>Endereço</label><input id="inputEndereco" type="text">
+<label>Horário</label><input id="inputHorario" type="text">
+<label>Logo URL</label><input id="inputLogo" type="text">
+
+<h2>Banner</h2>
+<label>Texto</label><input id="inputBannerTexto" type="text">
+<label>Imagem URL</label><input id="inputBannerImagem" type="text">
+<label>Carrossel (URLs separadas por vírgula)</label>
+<input id="inputCarrossel" type="text">
+
+<h2>Adicionar Produto</h2>
+<label>Nome</label><input id="inputProdutoNome" type="text">
+<label>Descrição</label><input id="inputProdutoDesc" type="text">
+<label>Preço</label><input id="inputProdutoPreco" type="number">
+<label>Imagem URL</label><input id="inputProdutoImg" type="text">
+<label>Ativo</label><input id="inputProdutoAtivo" type="checkbox" checked>
+<button id="btnAddProduto">Adicionar Produto</button>
+
+<button id="btnSalvar">Salvar Tudo</button>
+<button id="btnExportar">Exportar JSON</button>
+</main>
+
+<footer>
+<p id="lojaEndereco"></p>
+<p id="lojaHorario"></p>
+</footer>
+
+<script>
+// ======== STATE ========
+let state = JSON.parse(localStorage.getItem("seunegocio_state")) || {
+  dadosLoja: { nome:"Minha Loja", telefone:"", pix:"", endereco:"", horario:"", logo:"" },
+  publicidade: { texto:"", bannerImg:"", carrossel:[] },
+  produtos: []
+};
+
+// ======== FUNÇÕES ========
+function atualizarTotem() {
+  document.getElementById("lojaNome").textContent = state.dadosLoja.nome;
+  document.getElementById("lojaTelefone").textContent = state.dadosLoja.telefone;
+  document.getElementById("lojaPix").textContent = state.dadosLoja.pix;
+  document.getElementById("lojaEndereco").textContent = state.dadosLoja.endereco;
+  document.getElementById("lojaHorario").textContent = state.dadosLoja.horario;
+  document.getElementById("lojaLogo").src = state.dadosLoja.logo;
+
+  document.getElementById("bannerTexto").textContent = state.publicidade.texto;
+  document.getElementById("bannerImagem").src = state.publicidade.bannerImg;
+
+  const carrossel = document.getElementById("carrosselContainer");
+  carrossel.innerHTML = "";
+  state.publicidade.carrossel.forEach(url=>{
+    const img=document.createElement("img");
+    img.src=url;
+    carrossel.appendChild(img);
+  });
+
+  const produtosContainer=document.getElementById("produtosContainer");
+  produtosContainer.innerHTML="";
+  state.produtos.forEach(prod=>{
+    if(prod.ativo){
+      const card=document.createElement("div");
+      card.className="produto-card";
+      card.innerHTML=`<img src="${prod.imagem}" alt="${prod.nome}">
+        <h3>${prod.nome}</h3>
+        <p>${prod.descricao}</p>
+        <span class="preco">R$ ${prod.preco}</span>`;
+      produtosContainer.appendChild(card);
     }
+  });
 
-    // Banner
-    document.getElementById("bannerTexto").textContent = state.publicidade?.texto || "";
-    if (state.publicidade?.bannerImg) {
-      document.getElementById("bannerImagem").src = state.publicidade.bannerImg;
-    }
+  // Preencher inputs
+  document.getElementById("inputNome").value = state.dadosLoja.nome;
+  document.getElementById("inputTelefone").value = state.dadosLoja.telefone;
+  document.getElementById("inputPix").value = state.dadosLoja.pix;
+  document.getElementById("inputEndereco").value = state.dadosLoja.endereco;
+  document.getElementById("inputHorario").value = state.dadosLoja.horario;
+  document.getElementById("inputLogo").value = state.dadosLoja.logo;
+  document.getElementById("inputBannerTexto").value = state.publicidade.texto;
+  document.getElementById("inputBannerImagem").value = state.publicidade.bannerImg;
+  document.getElementById("inputCarrossel").value = state.publicidade.carrossel.join(",");
+}
 
-    // Carrossel
-    const carrossel = document.getElementById("carrosselContainer");
-    if (state.publicidade?.carrossel?.length) {
-      state.publicidade.carrossel.forEach(url => {
-        const img = document.createElement("img");
-        img.src = url;
-        carrossel.appendChild(img);
-      });
-    }
+// Salvar tudo
+function salvarState(){
+  // Dados da loja
+  state.dadosLoja.nome = document.getElementById("inputNome").value;
+  state.dadosLoja.telefone = document.getElementById("inputTelefone").value;
+  state.dadosLoja.pix = document.getElementById("inputPix").value;
+  state.dadosLoja.endereco = document.getElementById("inputEndereco").value;
+  state.dadosLoja.horario = document.getElementById("inputHorario").value;
+  state.dadosLoja.logo = document.getElementById("inputLogo").value;
 
-    // Produtos
-    const produtosContainer = document.getElementById("produtosContainer");
-    if (state.produtos?.length) {
-      state.produtos.forEach(prod => {
-        if (prod.ativo) {
-          const card = document.createElement("div");
-          card.className = "produto-card";
-          card.innerHTML = `
-            <img src="${prod.imagem}" alt="${prod.nome}">
-            <h3>${prod.nome}</h3>
-            <p>${prod.descricao || ""}</p>
-            <span class="preco">R$ ${prod.preco}</span>
-          `;
-          produtosContainer.appendChild(card);
-        }
-      });
-    }
-  </script>
+  // Banner
+  state.publicidade.texto = document.getElementById("inputBannerTexto").value;
+  state.publicidade.bannerImg = document.getElementById("inputBannerImagem").value;
+  state.publicidade.carrossel = document.getElementById("inputCarrossel").value.split(",").map(u=>u.trim()).filter(u=>u);
+
+  localStorage.setItem("seunegocio_state", JSON.stringify(state));
+  atualizarTotem();
+  alert("Dados salvos!");
+}
+
+// Adicionar produto
+document.getElementById("btnAddProduto").addEventListener("click", ()=>{
+  const nome = document.getElementById("inputProdutoNome").value;
+  const descricao = document.getElementById("inputProdutoDesc").value;
+  const preco = document.getElementById("inputProdutoPreco").value;
+  const imagem = document.getElementById("inputProdutoImg").value;
+  const ativo = document.getElementById("inputProdutoAtivo").checked;
+  if(!nome || !preco || !imagem){ alert("Nome, preço e imagem são obrigatórios"); return; }
+  state.produtos.push({nome, descricao, preco, imagem, ativo});
+  salvarState();
+  // limpar inputs
+  document.getElementById("inputProdutoNome").value="";
+  document.getElementById("inputProdutoDesc").value="";
+  document.getElementById("inputProdutoPreco").value="";
+  document.getElementById("inputProdutoImg").value="";
+  document.getElementById("inputProdutoAtivo").checked=true;
+});
+
+// Botões salvar e exportar
+document.getElementById("btnSalvar").addEventListener("click", salvarState);
+document.getElementById("btnExportar").addEventListener("click", ()=>{
+  const dataStr = JSON.stringify(state, null, 2);
+  const blob = new Blob([dataStr], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="seunegocio.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+atualizarTotem();
+</script>
 </body>
 </html>
